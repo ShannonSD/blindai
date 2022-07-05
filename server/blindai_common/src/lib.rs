@@ -92,3 +92,8 @@ pub struct SgxCollateral {
 pub trait UntrustedLocalApp {
     fn get_collateral_from_quote(quote: Vec<u8>) -> SgxCollateral;
 }
+
+#[tonic_rpc(json)]
+pub trait FakeLocalApp {
+    fn setup_app(message: Vec<u8>) -> String;
+}

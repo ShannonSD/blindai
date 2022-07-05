@@ -38,12 +38,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d301b3b94cb4b2f23d7917810addbbaff90738e0ca2be692bd027e70d7e0330c"
 
 [[package]]
-name = "arrayvec"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
-
-[[package]]
 name = "asn1-rs"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -52,7 +46,7 @@ dependencies = [
  "asn1-rs-derive 0.1.0",
  "asn1-rs-impl",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-traits",
  "rusticata-macros",
  "thiserror",
@@ -68,7 +62,7 @@ dependencies = [
  "asn1-rs-derive 0.3.0",
  "asn1-rs-impl",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-traits",
  "rusticata-macros",
  "thiserror",
@@ -217,7 +211,6 @@ dependencies = [
  "blindai_common",
  "blindai_rpc",
  "blindai_sgx",
- "blindai_sgx_attestation",
  "der-parser 6.0.1",
  "env_logger",
  "hex",
@@ -228,10 +221,6 @@ dependencies = [
  "reqwest",
  "rustls",
  "serde_json",
- "sgx-quote",
- "sgx_pkix",
- "sgx_types",
- "sgx_urts",
  "tokio",
  "tokio-stream",
  "toml",
@@ -297,8 +286,6 @@ dependencies = [
  "serde_cbor",
  "serde_derive",
  "serde_json",
- "sgx_tseal",
- "sgx_types",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -317,8 +304,6 @@ name = "blindai_sgx_attestation"
 version = "0.4.0"
 dependencies = [
  "log",
- "sgx_types",
- "sgx_urts",
  "thiserror",
 ]
 
@@ -480,7 +465,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4cddf120f700b411b2b02ebeb7f04dc0b7c8835909a6c2f52bf72ed0dd3433b2"
 dependencies = [
  "der-oid-macro",
- "nom 7.1.1",
+ "nom",
  "num-bigint 0.4.3",
  "num-traits",
  "rusticata-macros",
@@ -494,7 +479,7 @@ checksum = "fe398ac75057914d7d07307bf67dc7f3f574a26783b4fc7805a20ffa9f506e82"
 dependencies = [
  "asn1-rs 0.3.1",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-bigint 0.4.3",
  "num-traits",
  "rusticata-macros",
@@ -508,7 +493,7 @@ checksum = "42d4bc9b0db0a0df9ae64634ac5bdefb7afcb534e182275ca0beadbe486701c1"
 dependencies = [
  "asn1-rs 0.5.0",
  "displaydoc",
- "nom 7.1.1",
+ "nom",
  "num-traits",
  "rusticata-macros",
 ]
@@ -1100,19 +1085,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lexical-core"
-version = "0.7.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6607c62aa161d23d17a9072cc5da0be67cdfc89d3afb1e8d9c842bebc2525ffe"
-dependencies = [
- "arrayvec",
- "bitflags",
- "cfg-if",
- "ryu",
- "static_assertions",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.126"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1315,17 +1287,6 @@ dependencies = [
  "num-integer",
  "num-traits",
  "rawpointer",
-]
-
-[[package]]
-name = "nom"
-version = "5.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffb4262d26ed83a1c0a33a38fe2bb15797329c85770da05e6b828ddb782627af"
-dependencies = [
- "lexical-core",
- "memchr",
- "version_check",
 ]
 
 [[package]]
@@ -1901,12 +1862,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "quick-error"
-version = "1.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
-
-[[package]]
 name = "quote"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2102,7 +2057,7 @@ version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf0c4a6ece9950b9abdb62b1cfcf2a68b3b67a10ba445b3bb85be2a293d0632"
 dependencies = [
- "nom 7.1.1",
+ "nom",
 ]
 
 [[package]]
@@ -2251,88 +2206,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sgx-isa"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55adf0940448a33eac98b3c84ab2e567c1fbc086750bcfd72702d6facc39bb77"
-dependencies = [
- "bitflags",
-]
-
-[[package]]
-name = "sgx-quote"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1640577af7b81d10db340c4b31006b77972e3918f351eec4e65c389c8b58e21"
-dependencies = [
- "nom 5.1.2",
-]
-
-[[package]]
-name = "sgx_libc"
-version = "1.1.4"
-dependencies = [
- "sgx_types",
-]
-
-[[package]]
-name = "sgx_pkix"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bdf3793cb22f01be29fd8ac1f97df9b4685156ec6e9ddea6573b8b1819a7802b"
-dependencies = [
- "byteorder",
- "lazy_static",
- "pkix",
- "quick-error",
- "sgx-isa",
-]
-
-[[package]]
-name = "sgx_tcrypto"
-version = "1.1.4"
-dependencies = [
- "sgx_types",
-]
-
-[[package]]
-name = "sgx_trts"
-version = "1.1.4"
-dependencies = [
- "sgx_libc",
- "sgx_types",
-]
-
-[[package]]
-name = "sgx_tse"
-version = "1.1.4"
-dependencies = [
- "sgx_types",
-]
-
-[[package]]
-name = "sgx_tseal"
-version = "1.1.4"
-dependencies = [
- "sgx_tcrypto",
- "sgx_trts",
- "sgx_tse",
- "sgx_types",
-]
-
-[[package]]
-name = "sgx_types"
-version = "1.1.4"
-
-[[package]]
-name = "sgx_urts"
-version = "1.1.4"
-dependencies = [
- "libc",
- "sgx_types",
-]
-
-[[package]]
 name = "sha-1"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2398,12 +2271,6 @@ dependencies = [
  "base64ct",
  "der",
 ]
-
-[[package]]
-name = "static_assertions"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "subtle"
@@ -2853,7 +2720,7 @@ dependencies = [
  "byteorder",
  "flate2",
  "log",
- "nom 7.1.1",
+ "nom",
  "tar",
  "tract-core",
  "walkdir",
@@ -3222,7 +3089,7 @@ dependencies = [
  "data-encoding",
  "der-parser 6.0.1",
  "lazy_static",
- "nom 7.1.1",
+ "nom",
  "oid-registry 0.2.0",
  "rusticata-macros",
  "thiserror",
@@ -3239,7 +3106,7 @@ dependencies = [
  "data-encoding",
  "der-parser 7.0.0",
  "lazy_static",
- "nom 7.1.1",
+ "nom",
  "oid-registry 0.4.0",
  "rusticata-macros",
  "thiserror",
@@ -3309,71 +3176,3 @@ source = "git+https://github.com/mithril-security/rsa-sgx.git?branch=target-sgx#
 name = "tracing-core"
 version = "0.1.20"
 source = "git+https://github.com/mithril-security/tracing-sgx?branch=tracing-core-sgx#4853471f5ac23b3d95de1e6468056f83d7ccf060"
-
-[[patch.unused]]
-name = "sgx_alloc"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_build_helper"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_cov"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_crypto_helper"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_rand"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_rand_derive"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_serialize"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_serialize_derive"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_serialize_derive_internals"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_tcrypto_helper"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_tdh"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_tkey_exchange"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_tprotected_fs"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_tstd"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_tunittest"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_ucrypto"
-version = "1.1.4"
-
-[[patch.unused]]
-name = "sgx_unwind"
-version = "1.1.4"

@@ -16,21 +16,15 @@
 #![crate_type = "staticlib"]
 #![feature(once_cell)]
 
-use std::thread;
-
-use env_logger::Env;
 #[cfg(target_env = "sgx")]
 use std::backtrace::{self, PrintFormat};
-use std::{ffi::CStr, sync::Arc};
+use std::{ffi::CStr, os::raw::c_char, sync::Arc};
 
 use log::*;
-use sgx_types::*;
 use std::io::Read;
 use tonic::transport::ServerTlsConfig;
 
 use tonic::transport::{Identity, Server};
-
-use sgx_types::sgx_status_t;
 
 #[cfg(target_env = "sgx")]
 use std::untrusted::fs::File;
@@ -62,49 +56,12 @@ mod model_store;
 mod telemetry;
 mod untrusted;
 
-extern crate sgx_types;
-
-/// # Safety
-///
-/// `telemetry_platform` and `telemetry_uid` need to be valid C strings.
-/*
-#[no_mangle]
-pub unsafe extern "C" fn start_server(
-    telemetry_platform: *const c_char,
-    telemetry_uid: *const c_char,
-) -> sgx_status_t {
-    //#[cfg(target_env = "sgx")]
-    //let _ = backtrace::enable_backtrace("enclave.signed.so", PrintFormat::Full);
-
-    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
-
-    info!("Switched to enclave context");
-
-    let telemetry_platform = CStr::from_ptr(telemetry_platform);
-    let telemetry_uid = CStr::from_ptr(telemetry_uid);
-
-    let telemetry_platform = telemetry_platform.to_owned().into_string().unwrap();
-    let telemetry_uid = telemetry_uid.to_owned().into_string().unwrap();
-
-    tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(main(telemetry_platform, telemetry_uid))
-        .unwrap();
-
-    sgx_status_t::SGX_SUCCESS
-}
-*/
-
-pub unsafe extern fn start_server(
-    telemetry_platform: *const c_char,
-    telemetry_uid: *const c_char,
-) -> sgx_status_t {
+pub unsafe fn start_server(telemetry_platform: *const c_char, telemetry_uid: *const c_char) -> i32 {
     //#[cfg(target_env = "sgx")]
     //let _ = backtrace::enable_backtrace("enclave.signed.so", PrintFormat::Full);
     info!("Reached library start_server function");
-    //env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    //env_logger::Builder::from_env(Env::default().default_filter_or("info")).
+    // init();
 
     info!("Switched to enclave context");
 
@@ -113,7 +70,7 @@ pub unsafe extern fn start_server(
 
     let telemetry_platform = telemetry_platform.to_owned().into_string().unwrap();
     let telemetry_uid = telemetry_uid.to_owned().into_string().unwrap();
-    
+
     tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
@@ -121,22 +78,17 @@ pub unsafe extern fn start_server(
         .block_on(main(telemetry_platform, telemetry_uid))
         .unwrap();
 
-        //thread::spawn(|| {
-        //    main(telemetry_platform, telemetry_uid);
-        //}).join().expect("Thread panicked");
-        
-    
+    //thread::spawn(|| {
+    //    main(telemetry_platform, telemetry_uid);
+    //}).join().expect("Thread panicked");
+
     //main(telemetry_platform, telemetry_uid);
 
-    sgx_status_t::SGX_SUCCESS
-
+    return 1;
 }
-
-pub unsafe extern fn test_print()
-{
+pub unsafe extern "C" fn test_print() {
     println!("Test function called.");
 }
-
 
 async fn main(
     telemetry_platform: String,
@@ -167,9 +119,8 @@ async fn main(
     let untrusted_key = fs::read("tls/host_server.key")?;
     let untrusted_identity = Identity::from_pem(&untrusted_cert, &untrusted_key);
 
-    
     //Only performs dcap, so probably unnecessary without an enclave
-    
+
     tokio::spawn({
         let network_config = network_config.clone();
         async move {
@@ -187,7 +138,6 @@ async fn main(
             Ok::<(), Box<dyn std::error::Error + Sync + Send>>(())
         }
     });
-    
 
     let exchanger = Exchanger::new(
         ModelStore::new().into(),
