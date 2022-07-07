@@ -35,6 +35,8 @@ use std::fs::File;
 #[cfg(target_env = "sgx")]
 use std::untrusted::fs;
 
+use anyhow::{Context, Result};
+
 #[cfg(not(target_env = "sgx"))]
 use std::fs;
 
@@ -78,26 +80,18 @@ pub unsafe fn start_server(telemetry_platform: *const c_char, telemetry_uid: *co
         .block_on(main(telemetry_platform, telemetry_uid))
         .unwrap();
 
-    //thread::spawn(|| {
-    //    main(telemetry_platform, telemetry_uid);
-    //}).join().expect("Thread panicked");
-
-    //main(telemetry_platform, telemetry_uid);
-
     return 1;
 }
 pub unsafe extern "C" fn test_print() {
     println!("Test function called.");
 }
 
-async fn main(
-    telemetry_platform: String,
-    telemetry_uid: String,
-) -> Result<(), Box<dyn std::error::Error>> {
+async fn main(telemetry_platform: String, telemetry_uid: String) -> Result<()> {
     //#[cfg(target_env = "sgx")]
     //let _ = backtrace::enable_backtrace("enclave.signed.so", PrintFormat::Full);
     info!("Inside lib main!");
-    let (certificate, storage_identity, signing_key_seed) = identity::create_certificate()?;
+    let (certificate, storage_identity, signing_key_seed) =
+        identity::create_certificate().context("Creating certificate")?;
     let my_identity = Arc::new(MyIdentity::from_cert(
         certificate,
         storage_identity,
@@ -105,22 +99,30 @@ async fn main(
     ));
     let enclave_identity = my_identity.tls_identity.clone();
 
+    info!("Inside lib ddmain!");
     // Read network config into network_config
-    let mut file = File::open("config.toml")?;
+    let mut file = File::open("/opt/blindai/config.toml").context("Reading config.toml")?;
     let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
+    file.read_to_string(&mut contents)
+        .context("Reading config.toml file.")?;
     let network_config: blindai_common::NetworkConfig = toml::from_str(&contents)?;
 
+    info!("Insddide lib main!");
     let dcap_quote_provider = DcapQuoteProvider::new(&enclave_identity.cert_der);
     let dcap_quote_provider: &'static DcapQuoteProvider = Box::leak(Box::new(dcap_quote_provider));
 
     // Identity for untrusted (non-attested) communication
-    let untrusted_cert = fs::read("tls/host_server.pem")?;
-    let untrusted_key = fs::read("tls/host_server.key")?;
+
+    info!("Inside liddb main!");
+    let untrusted_cert =
+        fs::read("/opt/blindai/tls/host_server.pem").context("Reading host_server.pem")?;
+    let untrusted_key =
+        fs::read("/opt/blindai/tls/host_server.key").context("Reading host_server.key")?;
     let untrusted_identity = Identity::from_pem(&untrusted_cert, &untrusted_key);
 
     //Only performs dcap, so probably unnecessary without an enclave
 
+    info!("Inside lib maindd!");
     tokio::spawn({
         let network_config = network_config.clone();
         async move {
@@ -139,6 +141,7 @@ async fn main(
         }
     });
 
+    info!("Inside lib maindd!");
     let exchanger = Exchanger::new(
         ModelStore::new().into(),
         my_identity.clone(),
@@ -146,6 +149,7 @@ async fn main(
         network_config.max_input_size,
     );
 
+    info!("Inside lib main!");
     let server_future = Server::builder()
         .tls_config(ServerTlsConfig::new().identity((&enclave_identity).into()))?
         .max_frame_size(Some(65536))

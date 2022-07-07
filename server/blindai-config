@@ -1,0 +1,87 @@
+#!/bin/bash
+
+args_len=$#
+args=$@
+
+__help()
+{
+    printf "\n\t\tThis command helps configure the BlindAI server model capabilities\n";
+    printf "\n\t--max_model_size=\n"
+    printf "\t\tMax model size in bytes (default value: 500mb)\n"
+    printf "\t--max_input_size=\n"
+    printf "\t\tMax input size in bytes (default value: 500mb)\n"
+    printf "\t--default\n"
+    printf "\t\tReset the configuration to the default."
+    printf "\t-h,--help Print this message.\n\n"
+}
+
+MAX_MODEL_SIZE=524288000
+MAX_INPUT_SIZE=524288000
+
+if [ ${args_len} == 0 ];
+then
+    __help
+fi
+
+__message()
+{   
+    local key=$1
+    local value=$2
+
+    printf "\n\t${key} in /opt/blindai/config.toml has been set to ${value}\n\n"
+}
+__parse_arg()
+{
+    local arg=$1
+    
+    if [ ${arg} == "-h" ] || [ ${arg} == "--help" ];
+    then
+        __help
+    fi
+    local key=$(echo $arg | awk -F= '{print $1}')
+    local value=$(echo $arg | awk -F= '{print $2}')
+
+    case "$key" in 
+        "--max_input_size")
+            MAX_INPUT_SIZE=$value
+            __message "${key}" "${value}"
+            ;;
+        "--max_model_size")
+            MAX_MODEL_SIZE=$value
+            __message "${key}" "${value}"
+            ;;
+        "--default")
+            __message "--max_model_size" "${MAX_MODEL_SIZE}"
+            __message "--max_input_size" "${MAX_INPUT_SIZE}"
+            ;;
+    esac
+}
+
+
+for i in `seq 1 1 ${args_len}`
+do
+    __parse_arg $1
+    shift
+done
+
+toml="
+# [Unused Internal connection for Host -> Enclave communication
+internal_host_to_enclave_url = \"https://0.0.0.0:50054\"
+
+# Internal connection for Enclave -> Host communication
+internal_enclave_to_host_url = \"https://0.0.0.0:50053\"
+
+# Untrusted connection for Client -> Enclave communication
+client_to_enclave_untrusted_url = \"https://0.0.0.0:50052\"
+
+# Attested connection for Client -> Enclave communication
+client_to_enclave_attested_url = \"https://0.0.0.0:50051\"
+
+# Max model size in bytes (default value: 500mb)
+max_model_size = ${MAX_MODEL_SIZE}
+
+# Max input size in bytes (default value: 500mb)
+max_input_size = ${MAX_INPUT_SIZE}\n"
+
+
+printf "${toml}" > /opt/blindai/config.toml

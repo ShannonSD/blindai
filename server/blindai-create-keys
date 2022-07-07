@@ -1,0 +1,7 @@
+#!/bin/sh
+
+mkdir -p /opt/blindai/tls
+
+openssl req -newkey rsa:2048 -nodes -keyout /opt/blindai/tls/host_server.key  \
+		-x509 -days 365 -out /opt/blindai/tls/host_server.pem \
+		-subj "/C=FR/CN=blindai-srv"

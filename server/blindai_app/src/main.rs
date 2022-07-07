@@ -72,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!();
     info!("Starting Enclave...");
 
-    let mut file = File::open("config.toml")?;
+    let mut file = File::open("/opt/blindai/config.toml")?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
     let network_config: blindai_common::NetworkConfig = toml::from_str(&contents)?;
