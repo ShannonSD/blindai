@@ -162,13 +162,13 @@ async fn main(
         info!("Server running in simulation mode, attestation not available.");
     }
 
-    if std::env::var("BLINDAI_DISABLE_TELEMETRY").is_err() {
-        telemetry::setup(telemetry_platform, telemetry_uid)?;
-        info!("Telemetry is enabled.")
-    } else {
-        info!("Telemetry is disabled.")
-    }
-    telemetry::add_event(TelemetryEventProps::Started {}, None);
+    // if std::env::var("BLINDAI_DISABLE_TELEMETRY").is_err() {
+    //     telemetry::setup(telemetry_platform, telemetry_uid)?;
+    //     info!("Telemetry is enabled.")
+    // } else {
+    //         info!("Telemetry is disabled.")
+    //     }
+    // telemetry::add_event(TelemetryEventProps::Started {}, None);
 
     server_future.await?;
 
